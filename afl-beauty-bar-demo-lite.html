@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFL Beauty Bar — Where Beauty Meets Confidence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --white: #FEFCFA; --cream: #FAF6F1; --cream2: #F5EEE6;
+      --blush: #F2D9D0; --blush2: #E8C4B8;
+      --rose: #C4857A; --rose2: #B07068;
+      --gold: #C4A45A; --gold2: #D4B470; --gold-light: #E8D4A0;
+      --dark: #2A1A18; --charcoal: #3A2A28; --muted: #9A8A85;
+      --warm-cream: #F7F0E8;
+    }
+    html, body { background:var(--white); color:var(--dark); font-family:"Montserrat",sans-serif; font-weight:300; overflow-x:hidden; }
+
+    #intro { position:fixed; inset:0; z-index:1000; background:var(--warm-cream); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    #searchCanvas { position:absolute; inset:0; width:100%; height:100%; }
+    .intro-content { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 2rem; }
+    .intro-studio { font-family:"Montserrat",sans-serif; font-size:clamp(0.48rem,0.85vw,0.6rem); font-weight:300; letter-spacing:0.55em; color:var(--rose); text-transform:uppercase; opacity:0; margin-bottom:1.2rem; }
+    .intro-afl { font-family:"Cormorant Garamond",serif; font-size:clamp(5rem,14vw,13rem); font-weight:400; letter-spacing:0.15em; color:var(--gold); line-height:0.85; opacity:0; text-shadow:0 0 60px rgba(196,164,90,0.25); }
+    .intro-bar { font-family:"Montserrat",sans-serif; font-size:clamp(0.58rem,1.1vw,0.8rem); font-weight:300; letter-spacing:0.6em; color:var(--charcoal); text-transform:uppercase; margin-top:0.4rem; opacity:0; }
+    .intro-line { width:0; height:1px; background:linear-gradient(to right,transparent,var(--gold),transparent); margin:1.4rem auto 0; }
+    .intro-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:clamp(0.9rem,2vw,1.3rem); font-weight:300; color:var(--rose); letter-spacing:0.08em; opacity:0; margin-top:1.2rem; }
+    .intro-locations { font-size:clamp(0.46rem,0.75vw,0.56rem); letter-spacing:0.35em; text-transform:uppercase; color:var(--muted); opacity:0; margin-top:0.8rem; }
+
+    #site { opacity:0; pointer-events:none; }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 3rem; background:rgba(254,252,250,0.97); border-bottom:1px solid rgba(196,164,90,0.15); backdrop-filter:blur(10px); }
+    .nav-logo { font-family:"Cormorant Garamond",serif; font-size:1.2rem; font-weight:400; letter-spacing:0.2em; color:var(--dark); text-transform:uppercase; text-decoration:none; }
+    .nav-logo span { color:var(--gold); }
+    .nav-links { display:flex; gap:2rem; list-style:none; }
+    .nav-links a { font-size:0.56rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--gold); }
+    .nav-book { background:var(--gold); color:var(--white); font-size:0.56rem; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; padding:0.6rem 1.4rem; transition:background 0.2s; }
+    .nav-book:hover { background:var(--gold2); }
+
+    .hero { min-height:100vh; position:relative; overflow:hidden; display:flex; align-items:center; padding-top:5rem; }
+    .hero-bg { position:absolute; inset:0; background-size:cover; background-position:center top; }
+    .hero-overlay { position:absolute; inset:0; background:linear-gradient(to right, rgba(250,246,241,0.93) 42%, rgba(250,246,241,0.45) 72%, rgba(250,246,241,0.0) 100%); }
+    .hero-content { position:relative; z-index:2; padding:6rem 4rem 6rem 6rem; max-width:620px; }
+    .hero-eyebrow { font-size:0.56rem; letter-spacing:0.45em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:block; }
+    .hero-title { font-family:"Cormorant Garamond",serif; font-size:clamp(3.5rem,7vw,7rem); font-weight:300; line-height:0.88; color:var(--dark); margin-bottom:0.3rem; text-shadow:0 2px 20px rgba(250,246,241,0.9), 0 1px 8px rgba(250,246,241,0.9); }
+    .hero-title .afl { color:var(--gold); }
+    .hero-title em { font-style:italic; color:var(--rose); display:block; }
+    .hero-tagline { font-family:"Cormorant Garamond",serif; font-size:clamp(1rem,1.8vw,1.3rem); font-style:italic; font-weight:300; color:#5A4A45; margin:1.6rem 0 2.5rem; line-height:1.7; text-shadow:0 1px 12px rgba(250,246,241,0.85); }
+    .hero-cta { display:flex; gap:1rem; flex-wrap:wrap; }
+    .btn-gold { background:var(--gold); color:var(--white); font-family:"Montserrat",sans-serif; font-size:0.58rem; font-weight:600; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; padding:1rem 2.2rem; border:none; cursor:pointer; transition:background 0.2s,transform 0.15s; display:inline-block; }
+    .btn-gold:hover { background:var(--gold2); transform:translateY(-2px); }
+    .btn-outline { background:transparent; color:var(--dark); font-family:"Montserrat",sans-serif; font-size:0.58rem; font-weight:400; letter-spacing:0.25em; text-transform:uppercase; text-decoration:none; padding:1rem 2.2rem; border:1px solid rgba(196,164,90,0.45); cursor:pointer; transition:border-color 0.2s; display:inline-block; }
+    .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
+    .hero-press { margin-top:3rem; }
+    .hero-press-label { font-size:0.52rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--muted); margin-bottom:0.8rem; display:block; opacity:0.7; }
+    .hero-press-logos { display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center; }
+    .press-item { font-size:0.56rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); font-weight:500; opacity:0.55; }
+    .hero-badge { position:absolute; bottom:3rem; right:3rem; z-index:2; background:rgba(254,252,250,0.95); border:1px solid rgba(196,164,90,0.25); padding:1.5rem 2rem; text-align:center; backdrop-filter:blur(10px); }
+    .hero-badge-num { font-family:"Cormorant Garamond",serif; font-size:2.5rem; font-weight:300; color:var(--gold); line-height:1; }
+    .hero-badge-text { font-size:0.52rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-top:0.2rem; }
+
+    .press-strip { background:var(--dark); padding:0.9rem 0; overflow:hidden; }
+    .press-track { display:flex; gap:4rem; align-items:center; animation:scroll 25s linear infinite; width:max-content; }
+    .press-track-item { font-size:0.56rem; letter-spacing:0.28em; text-transform:uppercase; color:rgba(255,255,255,0.85); white-space:nowrap; font-weight:500; letter-spacing:0.32em; font-size:0.62rem; }
+    @keyframes scroll { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+
+    section { padding:7rem 2rem; }
+    .section-inner { max-width:1100px; margin:0 auto; }
+    .section-inner-narrow { max-width:720px; margin:0 auto; }
+    .eyebrow { font-size:0.54rem; letter-spacing:0.42em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:1rem; }
+    .section-title { font-family:"Cormorant Garamond",serif; font-size:clamp(2rem,5vw,3.8rem); font-weight:300; line-height:1.05; color:var(--dark); margin-bottom:1.4rem; }
+    .section-title em { font-style:italic; color:var(--rose); }
+    .gold-rule { width:40px; height:1px; background:var(--gold); margin:1.4rem 0; }
+    .gold-rule.center { margin:1.4rem auto; }
+
+    #about { background:var(--white); border-top:1px solid rgba(196,164,90,0.1); }
+    .about-grid { display:grid; grid-template-columns:1fr 400px; gap:6rem; align-items:center; }
+    .about-text p { font-size:0.95rem; line-height:1.95; color:#555; margin-bottom:1.3rem; }
+    .about-text p strong { color:var(--dark); font-weight:500; }
+    .about-pull { border-left:2px solid var(--gold); padding-left:1.8rem; margin:2rem 0; }
+    .about-pull p { font-family:"Cormorant Garamond",serif; font-size:1.5rem; font-style:italic; color:var(--dark); line-height:1.5; }
+    .about-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:2.5rem; }
+    .about-stat { background:var(--cream); border:1px solid rgba(196,164,90,0.12); padding:1.6rem 1.4rem; text-align:center; }
+    .about-stat-num { font-family:"Cormorant Garamond",serif; font-size:2.4rem; font-weight:300; color:var(--gold); line-height:1; margin-bottom:0.3rem; }
+    .about-stat-lbl { font-size:0.55rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); line-height:1.4; }
+    .about-img-wrap { position:relative; }
+    .about-img-wrap::before { content:""; position:absolute; top:-12px; right:-12px; bottom:12px; left:12px; background:var(--blush); z-index:0; }
+    .about-img { width:100%; aspect-ratio:3/4; object-fit:cover; object-position:top; display:block; position:relative; z-index:1; }
+
+    .clinic-section { background:var(--cream2); }
+    .clinic-mosaic { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:300px 300px; gap:2px; }
+    .clinic-mosaic-tall { grid-row:span 2; }
+    .clinic-mosaic img, .clinic-mosaic video { width:100%; height:100%; object-fit:cover; display:block; }
+
+    #treatments { background:var(--white); border-top:1px solid rgba(196,164,90,0.1); }
+    .treatments-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:3rem; }
+    .treatment-card { background:var(--cream); border:1px solid rgba(196,164,90,0.1); padding:2.4rem 2rem; transition:transform 0.2s,box-shadow 0.2s; position:relative; overflow:hidden; }
+    .treatment-card::after { content:""; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(to right,transparent,var(--gold),transparent); opacity:0; transition:opacity 0.3s; }
+    .treatment-card:hover { transform:translateY(-4px); box-shadow:0 8px 30px rgba(196,164,90,0.1); }
+    .treatment-card:hover::after { opacity:1; }
+    .treatment-card.signature { background:var(--blush); }
+    .treatment-tag { font-size:0.52rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; display:block; font-weight:500; }
+    .treatment-name { font-family:"Cormorant Garamond",serif; font-size:1.5rem; font-weight:300; color:var(--dark); margin-bottom:0.8rem; line-height:1.2; }
+    .treatment-desc { font-size:0.75rem; color:#666; line-height:1.8; }
+
+    #shop { background:var(--cream2); border-top:1px solid rgba(196,164,90,0.1); }
+    .shop-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:3rem; margin-bottom:2rem; }
+    .shop-card { background:var(--white); border:1px solid rgba(196,164,90,0.1); overflow:hidden; transition:transform 0.2s,box-shadow 0.2s; }
+    .shop-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(196,164,90,0.1); }
+    .shop-placeholder { width:100%; aspect-ratio:1; background:var(--blush); display:flex; align-items:center; justify-content:center; }
+    .shop-placeholder span { font-family:"Cormorant Garamond",serif; font-size:1.8rem; font-style:italic; color:var(--rose); opacity:0.4; }
+    .shop-info { padding:1.2rem; }
+    .shop-name { font-family:"Cormorant Garamond",serif; font-size:1rem; font-weight:300; color:var(--dark); margin-bottom:0.2rem; line-height:1.3; }
+    .shop-price { font-size:0.7rem; color:var(--gold); font-weight:500; }
+
+    #academy { background:var(--dark); border-top:1px solid rgba(196,164,90,0.15); }
+    #academy .eyebrow { color:var(--gold-light); }
+    #academy .section-title { color:var(--white); }
+    #academy .section-title em { color:var(--gold2); }
+    .academy-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:center; }
+    .academy-p { font-size:0.95rem; line-height:1.95; color:rgba(255,255,255,0.65); margin-bottom:1.3rem; }
+    .academy-p strong { color:var(--white); font-weight:500; }
+    .academy-features { list-style:none; display:flex; flex-direction:column; gap:0.8rem; margin-top:1.8rem; }
+    .academy-features li { font-size:0.8rem; color:rgba(255,255,255,0.65); display:flex; align-items:center; gap:0.8rem; }
+    .academy-features li::before { content:""; width:4px; height:4px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+    .academy-card { background:var(--cream); padding:3rem; }
+    .academy-card .eyebrow { color:var(--gold); }
+    .academy-card-title { font-family:"Cormorant Garamond",serif; font-size:2rem; font-weight:300; color:var(--dark); margin-bottom:1rem; line-height:1.2; }
+    .academy-card-desc { font-size:0.82rem; color:#555; line-height:1.8; margin-bottom:2rem; }
+
+    #locations { background:var(--white); border-top:1px solid rgba(196,164,90,0.1); }
+    .locations-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:3rem; }
+    .location-card { background:var(--cream); border:1px solid rgba(196,164,90,0.1); padding:2.4rem 2rem; text-align:center; transition:transform 0.2s; }
+    .location-card:hover { transform:translateY(-3px); }
+    .location-card.featured { background:var(--gold); }
+    .location-city { font-family:"Cormorant Garamond",serif; font-size:1.8rem; font-weight:300; color:var(--dark); margin-bottom:0.4rem; }
+    .location-card.featured .location-city { color:var(--white); }
+    .location-state { font-size:0.56rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:0.8rem; }
+    .location-card.featured .location-state { color:rgba(255,255,255,0.75); }
+    .location-detail { font-size:0.7rem; color:var(--muted); line-height:1.6; }
+    .location-card.featured .location-detail { color:rgba(255,255,255,0.7); }
+
+    #book { background:var(--blush); border-top:1px solid rgba(196,164,90,0.15); text-align:center; }
+    #book p { font-size:0.95rem; line-height:1.9; color:var(--charcoal); max-width:500px; margin:0 auto 2.5rem; opacity:0.8; }
+    .book-options { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; max-width:860px; margin:0 auto 2rem; }
+    .book-card { background:var(--white); border:1px solid rgba(196,164,90,0.12); padding:2.4rem 2rem; text-align:left; transition:border-color 0.2s; }
+    .book-card:hover { border-color:rgba(196,164,90,0.35); }
+    .book-card-title { font-family:"Cormorant Garamond",serif; font-size:1.3rem; font-weight:300; color:var(--dark); margin-bottom:0.5rem; }
+    .book-card-desc { font-size:0.73rem; color:var(--muted); line-height:1.7; margin-bottom:1.5rem; }
+    .btn-dark { background:var(--dark); color:var(--white); font-family:"Montserrat",sans-serif; font-size:0.58rem; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; text-decoration:none; padding:0.8rem 1.6rem; display:inline-block; transition:background 0.2s; }
+    .btn-dark:hover { background:var(--gold); }
+    .btn-rose { background:var(--rose); color:var(--white); font-family:"Montserrat",sans-serif; font-size:0.58rem; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; text-decoration:none; padding:0.8rem 1.6rem; display:inline-block; transition:background 0.2s; }
+    .btn-rose:hover { background:var(--rose2); }
+
+    footer { background:var(--dark); border-top:1px solid rgba(196,164,90,0.15); padding:3rem 2rem; text-align:center; }
+    .footer-inner { max-width:1100px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:1.2rem; }
+    .footer-logo { font-family:"Cormorant Garamond",serif; font-size:1.1rem; font-weight:300; letter-spacing:0.28em; color:var(--white); text-transform:uppercase; }
+    .footer-logo span { color:var(--gold); }
+    .footer-links { display:flex; gap:2rem; list-style:none; flex-wrap:wrap; justify-content:center; }
+    .footer-links a { font-size:0.54rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--gold); }
+    .footer-credit { font-size:0.6rem; color:var(--muted); opacity:0.5; letter-spacing:0.06em; }
+    .footer-credit a { color:var(--gold); text-decoration:none; opacity:0.8; }
+
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    @media(max-width:768px){
+      nav { padding:1.2rem 1.5rem; }
+      .nav-links,.nav-book { display:none; }
+      .about-grid,.academy-grid { grid-template-columns:1fr; gap:3rem; }
+      .clinic-mosaic,.treatments-grid,.shop-grid,.locations-grid,.book-options { grid-template-columns:1fr; }
+      section { padding:5rem 1.5rem; }
+      .hero-content { padding:4rem 2rem; }
+      .hero-badge { display:none; }
+    }
+  
+    .shiny-gold {
+      background: linear-gradient(135deg, #B8923E 0%, #E8D4A0 25%, #C4A45A 50%, #F0DCA8 65%, #B8923E 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation: shine 4s linear infinite;
+    }
+    @keyframes shine {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="intro">
+  <canvas id="searchCanvas"></canvas>
+  <div class="intro-content">
+    <div class="intro-studio" id="introStudio">Miami &middot; New York &middot; Los Angeles &middot; Atlanta</div>
+    <div class="intro-afl shiny-gold" id="introAFL">AFL</div>
+    <div class="intro-bar" id="introBar">Beauty Bar</div>
+    <div class="intro-line" id="introLine"></div>
+    <div class="intro-tagline" id="introTagline">Where Beauty Meets Confidence</div>
+    <div class="intro-locations" id="introLocations">Est. 2018 &middot; Founded by Fatema Love</div>
+  </div>
+</div>
+
+<div id="site">
+  <nav>
+    <a href="#" class="nav-logo"><span class="shiny-gold">AFL</span> Beauty Bar</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#treatments">Treatments</a></li>
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#academy">Academy</a></li>
+      <li><a href="#locations">Locations</a></li>
+    </ul>
+    <a href="https://web2.myaestheticspro.com/BN/index.cfm?0A342B84DA245EBD2DB52E6754C0065D" class="nav-book" target="_blank">Book Now</a>
+  </nav>
+
+  <section class="hero" style="background:#1a1410;">
+    <video class="hero-bg-video" autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <source src="glass-office-cinematic.mp4" type="video/mp4" />
+    </video>
+    <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(250,246,241,0.78) 0%, rgba(250,246,241,0.4) 45%, rgba(42,26,24,0.4) 100%);"></div>
+    <div class="hero-content" style="z-index:3;">
+      <span class="hero-eyebrow">Miami &middot; New York &middot; Los Angeles &middot; Atlanta</span>
+      <h1 class="hero-title"><span class="afl shiny-gold">AFL</span><em>Beauty Bar</em></h1>
+      <p class="hero-tagline">Where beauty meets confidence. Elevate your life and enhance your existing beauty in the hands of America&apos;s most sought-after injector.</p>
+      <div class="hero-cta">
+        <a href="https://web2.myaestheticspro.com/BN/index.cfm?0A342B84DA245EBD2DB52E6754C0065D" class="btn-gold" target="_blank">Book Appointment</a>
+        <a href="#treatments" class="btn-outline">Explore Treatments</a>
+      </div>
+      <div class="hero-press">
+        <span class="hero-press-label">As seen in</span>
+        <div class="hero-press-logos">
+          <span class="press-item">Dr. Phil</span>
+          <span class="press-item">E! News</span>
+          <span class="press-item">TLC</span>
+          <span class="press-item">Hollywood Unlocked</span>
+          <span class="press-item">NY Post</span>
+        </div>
+      </div>
+    </div>
+    <img src="fatema-cutout.png" alt="Fatema Love" style="position:absolute;right:2%;bottom:0;height:92%;max-width:48%;object-fit:contain;z-index:2;mix-blend-mode:screen;" />
+    <div class="hero-badge" style="z-index:3;">
+      <div class="hero-badge-num">4+</div>
+      <div class="hero-badge-text">Locations Nationwide</div>
+    </div>
+  </section>
+
+  <div class="press-strip">
+    <div class="press-track">
+      <span class="press-track-item">Dr. Phil</span><span class="press-track-item">E! News</span>
+      <span class="press-track-item">TLC</span><span class="press-track-item">Hollywood Unlocked</span>
+      <span class="press-track-item">New York Post</span><span class="press-track-item">Daily News</span>
+      <span class="press-track-item">Medical Spa Excellence Award</span><span class="press-track-item">Celebrity Injector</span>
+      <span class="press-track-item">Est. 2018 &middot; Fatema Love</span>
+      <span class="press-track-item">Dr. Phil</span><span class="press-track-item">E! News</span>
+      <span class="press-track-item">TLC</span><span class="press-track-item">Hollywood Unlocked</span>
+      <span class="press-track-item">New York Post</span><span class="press-track-item">Daily News</span>
+      <span class="press-track-item">Medical Spa Excellence Award</span><span class="press-track-item">Celebrity Injector</span>
+      <span class="press-track-item">Est. 2018 &middot; Fatema Love</span>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="reveal">
+          <span class="eyebrow">The Visionary</span>
+          <h2 class="section-title">Fatema<br/><em>Love.</em></h2>
+          <div class="gold-rule"></div>
+          <p>From a single dream to one of the most recognized med spa brands in America &mdash; <strong>Fatema Love built AFL Beauty Bar from the ground up in 2018.</strong> A Palestinian refugee who arrived in the United States with nothing but resilience and vision, Fatema turned her story into a sanctuary for all.</p>
+          <p>Renowned for her meticulous attention to detail and innovative techniques, she has earned the trust of celebrities, socialites, and top influencers across the country. With locations in Miami, New York, Los Angeles, and Atlanta &mdash; AFL Beauty Bar has redefined what a luxury med spa experience looks and feels like.</p>
+          <p style="font-size:0.88rem;line-height:1.85;color:#555;margin-bottom:1.3rem;">Alongside <strong style="color:#2A1A18;font-weight:500;">Tatiana Enis, COO</strong> &mdash; the operational force behind AFL&apos;s national expansion &mdash; Fatema has scaled AFL Beauty Bar into a brand that celebrities, socialites, and beauty lovers trust across four major cities.</p>
+    <div class="about-pull"><p>&ldquo;AFL is a place where all people come to elevate their life and feel beautiful.&rdquo;</p></div>
+          <div class="about-stats">
+            <div class="about-stat"><div class="about-stat-num">2018</div><div class="about-stat-lbl">Founded in New York</div></div>
+            <div class="about-stat"><div class="about-stat-num">4+</div><div class="about-stat-lbl">Locations Nationwide</div></div>
+            <div class="about-stat"><div class="about-stat-num">113K+</div><div class="about-stat-lbl">Instagram Following</div></div>
+          </div>
+        </div>
+        <div class="about-img-wrap reveal">
+          <img class="about-img" src="fatema-hero.jpg" alt="Fatema Love Founder AFL Beauty Bar" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="clinic-section" style="padding:0;">
+    <div class="clinic-mosaic">
+      <div class="clinic-mosaic-tall">
+        <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;background:#000;display:block;"><source src="glass-office-cinematic.mp4" type="video/mp4" /></video>
+      </div>
+      <div>
+        <img src="wynwood-glass-room.jpg" alt="AFL Beauty Bar Glass Room" />
+      </div>
+      <div>
+        <img src="marble-lounge.jpg" alt="AFL Beauty Bar Marble Lounge" style="width:100%;height:100%;object-fit:cover;display:block;" />
+      </div>
+    </div>
+    <div style="padding:3rem 2rem;text-align:center;background:var(--cream2);">
+      <span class="eyebrow" style="text-align:center;display:block;">The Experience</span>
+      <h2 class="section-title" style="text-align:center;">Step inside <em>AFL.</em></h2>
+    </div>
+  </section>
+
+  <section id="treatments">
+    <div class="section-inner">
+      <span class="eyebrow reveal">Treatments</span>
+      <h2 class="section-title reveal">Science meets<br/><em>artistry.</em></h2>
+      <div class="gold-rule reveal"></div>
+      <div class="treatments-grid">
+        <div class="treatment-card treatment-signature reveal"><span class="treatment-tag">Fatema&apos;s Signature</span><div class="treatment-name">Salmon DNA Facial</div><div class="treatment-desc">A deeply hydrating regenerative facial using salmon DNA to restore elasticity, improve texture, and deliver luminous radiance. Exclusive to AFL.</div></div>
+        <div class="treatment-card treatment-signature reveal"><span class="treatment-tag">Fatema&apos;s Signature</span><div class="treatment-name">Non-Invasive Brazilian Butt Lift</div><div class="treatment-desc">AFL&apos;s most iconic body treatment. A non-surgical lift and sculpt that enhances your natural curves without any downtime.</div></div>
+        <div class="treatment-card treatment-signature reveal"><span class="treatment-tag">Fatema&apos;s Signature</span><div class="treatment-name">Weight Loss Shots</div><div class="treatment-desc">Metabolism-boosting injections designed to support natural fat breakdown, increase energy, and enhance your wellness journey from within.</div></div>
+        <div class="treatment-card reveal"><span class="treatment-tag">Injectables</span><div class="treatment-name">Neurotoxins</div><div class="treatment-desc">Botox and Dysport administered with precision by Fatema. Smoothing fine lines for a refreshed, completely natural appearance.</div></div>
+        <div class="treatment-card reveal"><span class="treatment-tag">Body</span><div class="treatment-name">Body Contouring</div><div class="treatment-desc">Advanced non-invasive body sculpting that targets stubborn fat, tightens skin, and enhances your contours with zero downtime.</div></div>
+        <div class="treatment-card reveal"><span class="treatment-tag">Face</span><div class="treatment-name">HydraFacial</div><div class="treatment-desc">The ultimate skin health treatment. Cleansing, exfoliating, extracting, and hydrating in one luxurious session. Instant glow, no downtime.</div></div>
+      </div>
+      <div style="text-align:center;margin-top:2rem;"><a href="https://aflbeautybar.com" class="btn-gold" target="_blank">View All Treatments &rarr;</a></div>
+    </div>
+  </section>
+
+  <section id="shop">
+    <div class="section-inner">
+      <span class="eyebrow reveal">The AFL Shop</span>
+      <h2 class="section-title reveal">Beauty you can<br/><em>take home.</em></h2>
+      <div class="gold-rule reveal"></div>
+      <div class="shop-grid">
+        <div class="shop-card reveal"><div class="shop-placeholder"><span>Skincare</span></div><div class="shop-info"><div class="shop-name">20% Vitamin C Brightening Serum</div><div class="shop-price">$135</div></div></div>
+        <div class="shop-card reveal"><div class="shop-placeholder"><span>Skincare</span></div><div class="shop-info"><div class="shop-name">Peptide Firming Eye Cream</div><div class="shop-price">$85</div></div></div>
+        <div class="shop-card reveal"><div class="shop-placeholder"><span>Beauty</span></div><div class="shop-info"><div class="shop-name">Soft Sculpt Contour Stick</div><div class="shop-price">$20</div></div></div>
+        <div class="shop-card reveal" style="background:var(--blush);display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;"><div><div style="font-family:Cormorant Garamond,serif;font-size:1.3rem;font-weight:300;color:var(--dark);margin-bottom:0.8rem;">Browse the Full Collection</div><a href="https://aflbeautybar.com/shop/" class="btn-gold" target="_blank">Shop AFL &rarr;</a></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="academy">
+    <div class="section-inner">
+      <div class="academy-grid">
+        <div class="reveal">
+          <span class="eyebrow">For Aspiring Injectors</span>
+          <h2 class="section-title">The AFL<br/><em>Academy.</em></h2>
+          <div class="gold-rule"></div>
+          <p class="academy-p">Fatema Love doesn&apos;t just practice beauty &mdash; she teaches it. The AFL Academy is where aspiring injectors and aesthetic professionals come to learn from one of the industry&apos;s most recognized experts.</p>
+          <p class="academy-p">From foundational injection techniques to advanced aesthetic protocols &mdash; the AFL Academy equips students with the skills, confidence, and certification to build their own practice.</p>
+          <ul class="academy-features">
+            <li>Hands-on training with Fatema Love directly</li>
+            <li>Advanced injection and aesthetic techniques</li>
+            <li>Business building and client acquisition strategies</li>
+            <li>Certification upon completion</li>
+            <li>Ongoing mentorship and community support</li>
+          </ul>
+        </div>
+        <div class="academy-card reveal">
+          <span class="eyebrow">Learn from the Best</span>
+          <div class="academy-card-title">Train with Fatema Love</div>
+          <div class="academy-card-desc">Join a growing community of aesthetic professionals trained by one of the most sought-after injectors in the country. The AFL Academy is your path from aspiring to thriving.</div>
+          <a href="https://aflbeautybar.com/academy-2/" class="btn-gold" target="_blank">Explore the Academy &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="locations">
+    <div class="section-inner">
+      <span class="eyebrow reveal">Find Us</span>
+      <h2 class="section-title reveal">Four cities.<br/><em>One standard.</em></h2>
+      <div class="gold-rule reveal"></div>
+      <div class="locations-grid">
+        <div class="location-card featured reveal"><div class="location-city">Miami</div><div class="location-state" style="color:rgba(255,255,255,0.75);">Florida</div><div class="location-detail">51-53 NE 24th St, STE 107<br/>(786) 750-2355</div></div>
+        <div class="location-card reveal"><div class="location-city">New York</div><div class="location-state">New York</div><div class="location-detail">Now Open</div></div>
+        <div class="location-card reveal"><div class="location-city">Los Angeles</div><div class="location-state">California</div><div class="location-detail">Now Open</div></div>
+        <div class="location-card reveal"><div class="location-city">Atlanta</div><div class="location-state">Georgia</div><div class="location-detail">Now Open</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="book">
+    <div class="section-inner-narrow">
+      <span class="eyebrow" style="text-align:center;display:block;">Ready to Begin</span>
+      <h2 class="section-title" style="text-align:center;">Your most<br/><em>beautiful self awaits.</em></h2>
+      <div class="gold-rule center"></div>
+      <p>Whether you&apos;re booking a treatment, exploring the shop, or joining the Academy &mdash; AFL Beauty Bar is ready for you.</p>
+      <div class="book-options">
+        <div class="book-card reveal"><div class="book-card-title">Book a Treatment</div><div class="book-card-desc">Reserve your appointment online. Walk in ready to be transformed by Fatema and her team.</div><a href="https://web2.myaestheticspro.com/BN/index.cfm?0A342B84DA245EBD2DB52E6754C0065D" class="btn-dark" target="_blank">Book Now &rarr;</a></div>
+        <div class="book-card reveal"><div class="book-card-title">Shop AFL</div><div class="book-card-desc">Fatema-approved products and gift cards. Bring the luxury of the clinic into your daily routine.</div><a href="https://aflbeautybar.com/shop/" class="btn-gold" target="_blank">Shop Now &rarr;</a></div>
+        <div class="book-card reveal"><div class="book-card-title">Call or Text</div><div class="book-card-desc">We&apos;re here to help you choose the right treatment for your skin and your goals.</div><a href="tel:7867502355" class="btn-rose">(786) 750-2355</a></div>
+      </div>
+      <p style="font-size:0.68rem;color:var(--muted);text-align:center;margin-top:1rem;">Miami &middot; New York &middot; Los Angeles &middot; Atlanta</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo"><span class="shiny-gold">AFL</span> Beauty Bar</div>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li><li><a href="#treatments">Treatments</a></li>
+        <li><a href="#shop">Shop</a></li><li><a href="#academy">Academy</a></li>
+        <li><a href="#locations">Locations</a></li><li><a href="#book">Book</a></li>
+      </ul>
+      <p class="footer-credit">Cinematic Web Experience by <a href="https://bit.ly/RainMgmt" target="_blank">Rain Management Solutions</a> &middot; Cinematic Brand Experiences. Lasting Impressions.</p>
+      <p class="footer-credit" style="margin-top:0.3rem;">&copy; 2026 &middot; AFL Beauty Bar &middot; Founded by Fatema Love &middot; Miami &middot; New York &middot; Los Angeles &middot; Atlanta</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+const canvas=document.getElementById("searchCanvas"),ctx=canvas.getContext("2d");
+const intro=document.getElementById("intro"),site=document.getElementById("site");
+const studioEl=document.getElementById("introStudio"),aflEl=document.getElementById("introAFL");
+const barEl=document.getElementById("introBar"),lineEl=document.getElementById("introLine");
+const tagEl=document.getElementById("introTagline"),locEl=document.getElementById("introLocations");
+
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize(); window.addEventListener("resize",resize);
+
+const lights=[{angle:-0.5,speed:0.0038,side:"left"},{angle:0.5,speed:0.0032,side:"right"}];
+let t=0,lightsAlpha=0,running=true;
+
+function drawSearchlights(){
+  if(!running)return;
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  t+=0.016;
+  lights[0].angle=-0.45+Math.sin(t*lights[0].speed*60)*0.5;
+  lights[1].angle=0.45+Math.sin(t*lights[1].speed*60+Math.PI)*0.5;
+
+  lights.forEach(light=>{
+    const originX=light.side==="left"?W*0.15:W*0.85;
+    const originY=H,beamLength=H*1.6;
+    const beamEndX=originX+Math.sin(light.angle)*beamLength;
+    const beamEndY=originY-Math.cos(Math.abs(light.angle))*beamLength;
+    const spread=beamLength*0.09;
+    const perpX=Math.cos(light.angle),perpY=Math.sin(light.angle);
+
+    const grad=ctx.createLinearGradient(originX,originY,beamEndX,beamEndY);
+    grad.addColorStop(0,`rgba(232,196,184,${lightsAlpha*0.0})`);
+    grad.addColorStop(0.08,`rgba(232,196,184,${lightsAlpha*0.14})`);
+    grad.addColorStop(0.5,`rgba(212,180,112,${lightsAlpha*0.05})`);
+    grad.addColorStop(1,"rgba(196,164,90,0)");
+    ctx.beginPath();
+    ctx.moveTo(originX-perpX*8,originY-perpY*8);
+    ctx.lineTo(beamEndX-perpX*spread,beamEndY-perpY*spread);
+    ctx.lineTo(beamEndX+perpX*spread,beamEndY+perpY*spread);
+    ctx.lineTo(originX+perpX*8,originY+perpY*8);
+    ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+
+    const coreGrad=ctx.createLinearGradient(originX,originY,beamEndX,beamEndY);
+    coreGrad.addColorStop(0,`rgba(255,220,180,${lightsAlpha*0.0})`);
+    coreGrad.addColorStop(0.05,`rgba(255,210,160,${lightsAlpha*0.4})`);
+    coreGrad.addColorStop(0.4,`rgba(212,180,112,${lightsAlpha*0.1})`);
+    coreGrad.addColorStop(1,"rgba(196,164,90,0)");
+    ctx.beginPath();
+    ctx.moveTo(originX-perpX*2,originY-perpY*2);
+    ctx.lineTo(beamEndX-perpX*spread*0.15,beamEndY-perpY*spread*0.15);
+    ctx.lineTo(beamEndX+perpX*spread*0.15,beamEndY+perpY*spread*0.15);
+    ctx.lineTo(originX+perpX*2,originY+perpY*2);
+    ctx.closePath(); ctx.fillStyle=coreGrad; ctx.fill();
+
+    const sg=ctx.createRadialGradient(originX,originY,0,originX,originY,55);
+    sg.addColorStop(0,`rgba(255,210,160,${lightsAlpha*0.35})`);
+    sg.addColorStop(0.4,`rgba(212,180,112,${lightsAlpha*0.08})`);
+    sg.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.beginPath(); ctx.arc(originX,originY,55,0,Math.PI*2);
+    ctx.fillStyle=sg; ctx.fill();
+  });
+  requestAnimationFrame(drawSearchlights);
+}
+requestAnimationFrame(drawSearchlights);
+
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function easeOut(t){return 1-Math.pow(1-t,3);}
+function fadeTo(el,target,ms){
+  return new Promise(resolve=>{
+    const start=parseFloat(el.style.opacity)||0,t0=performance.now();
+    function step(now){const p=Math.min((now-t0)/ms,1);el.style.opacity=start+(target-start)*easeOut(p);if(p<1)requestAnimationFrame(step);else resolve();}
+    requestAnimationFrame(step);
+  });
+}
+function animLine(el,ms){
+  return new Promise(resolve=>{
+    const t0=performance.now();
+    function step(now){const p=Math.min((now-t0)/ms,1);el.style.width=(easeOut(p)*320)+"px";if(p<1)requestAnimationFrame(step);else resolve();}
+    requestAnimationFrame(step);
+  });
+}
+
+async function runIntro(){
+  await wait(400);
+  const ls=performance.now();
+  await new Promise(resolve=>{function step(now){lightsAlpha=Math.min((now-ls)/1600,1);if(lightsAlpha<1)requestAnimationFrame(step);else resolve();}requestAnimationFrame(step);});
+  await wait(500);
+  await fadeTo(studioEl,1,700); await wait(300);
+  await fadeTo(aflEl,1,900); await wait(200);
+  await fadeTo(barEl,1,600); await wait(300);
+  await animLine(lineEl,700); await wait(300);
+  await fadeTo(tagEl,1,700); await wait(200);
+  await fadeTo(locEl,1,600);
+  await wait(2500);
+  running=false;
+  intro.style.transition="opacity 1.2s ease";
+  intro.style.opacity="0";
+  site.style.transition="opacity 1.2s ease 0.5s";
+  site.style.opacity="1";
+  site.style.pointerEvents="auto";
+  await wait(2000);
+  intro.style.display="none";
+}
+runIntro();
+
+const revEls=document.querySelectorAll(".reveal");
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target);}});},{threshold:0.1});
+revEls.forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
